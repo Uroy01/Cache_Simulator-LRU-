@@ -1,22 +1,7 @@
-CC=clang
-CFLAGS=-std=c17 -Wall -g
+CC=gcc
+CFLAGS= -ansi -pedantic -Wall -m32
 
-TARGET_NAME=lru-cache-simulation
-
-SOURCE_FILES=\
-	$(TARGET_NAME).c
-
-INCLUDE_DIRECTORIES=
-
-SYMBOLS=
-
-all: clean default
-
-default: $(TARGET_NAME)
-
-$(TARGET_NAME):
-	$(CC) $(CFLAGS) $(INCLUDE_DIRECTORIES) $(SYMBOLS) $(SOURCE_FILES) -o $(TARGET_NAME)
-
+c-sim : c-sim.c
+	$(CC) $(CFLAGS) $^ -o $@
 clean:
-	rm -f $(TARGET_NAME)
-	rm -rf $(TARGET_NAME).dSYM
+	rm c-sim
