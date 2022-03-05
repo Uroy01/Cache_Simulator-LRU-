@@ -3,10 +3,7 @@
 #include <stdlib.h>
 #include "c-sim.h"
 
-/*
-creates a cold cache (every line invalid)
-time: O(n), space: O(n), where n = the number of lines
-*/
+
 CacheLine *create_cold_cache(){
     int i;
     CacheLine *cache;
@@ -24,10 +21,7 @@ CacheLine *create_cold_cache(){
     return cache;
 }
 
-/*
-sets number of bits needed for the set index and the block offset
-time: O(log(m) + log(n)), space: O(1), where m = block size and n = number of sets
-*/
+
 void set_subs(){
     int i = 1;
     for(; i < block_size; i*=2){
@@ -47,18 +41,12 @@ void set_subs(){
     }
 }
 
-/*
-gets tag length of each address using the block size and number of sets
-time: O(1), space: O(1), where n = associativity
-*/
+
 int get_tag_length(char address[]){
     return strlen(address) - set_sub - block_sub;
 }
 
-/*
-converts an address to binary
-time: O(n), space: O(n), where n = length of the address
-*/
+
 char *convert_to_binary(char address[]){
     char *binary = (char *)malloc(sizeof(char) * 81);
     int i = 2;
@@ -85,10 +73,7 @@ char *convert_to_binary(char address[]){
     return binary;
 }
 
-/*
-gets set index from binary address
-time: O(n), space: O(1), where n = log(number of sets)
-*/
+
 int get_index(char address[], int tag_length){
     int index = 0;
     int exp = 1;
@@ -102,10 +87,7 @@ int get_index(char address[], int tag_length){
     return index;
 }
 
-/*
-updates the most recently used set, allowing us to find the least used line
-time: O(n), space: O(1), where n = associativity
-*/
+
 void update_recents(int new, int index){
     int i = index * assoc;
     for(; i < index * assoc + assoc; i++){
@@ -114,10 +96,6 @@ void update_recents(int new, int index){
     cache[new].recent = 0;
 }
 
-/*
-performs a write-through write operation using an address read from the file
-time: O(n), O(1), where n = associativity
-*/
 void write_to_cache(char address[]){
     int highest = 0;
     int index = get_index(address, get_tag_length(address)) * assoc;
@@ -161,10 +139,7 @@ void write_to_cache(char address[]){
     update_recents(highest_index, cache[highest_index].set);
 }
 
-/*
-performs a write-through read operation using an address read from the file
-time: O(n), O(1), where n = associativity
-*/
+
 void read_from_cache(char address[]){
     int index = get_index(address, get_tag_length(address)) * assoc;
     int highest_index = index;
@@ -205,10 +180,7 @@ void read_from_cache(char address[]){
     update_recents(highest_index, cache[highest_index].set);
 }
 
-/*
-performs a write-back write operation using an address read from the file
-time: O(n), O(1), where n = associativity
-*/
+
 void write_to_cache_wb(char address[]){
     int index = get_index(address, get_tag_length(address)) * assoc;
     int highest_index = index;
@@ -256,10 +228,7 @@ void write_to_cache_wb(char address[]){
     update_recents(highest_index, cache[highest_index].set);
 }
 
-/*
-performs a write-back read operation using an address read from the file
-time: O(n), O(1), where n = associativity
-*/
+
 void read_from_cache_wb(char address[]){
     int index = get_index(address, get_tag_length(address)) * assoc;
     int highest_index = index;
