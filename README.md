@@ -1,4 +1,4 @@
-# Cache_Simulator-LRU-Using C
+# Cache_Simulator-LRU-Using C++
 
 
 This simulates L1 level cache with a LRU (least recently used) replacement algorithm.
