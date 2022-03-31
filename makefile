@@ -17,7 +17,9 @@ TestCase:
 0x007C|-0x008D|-0x009C|-0x748A-|
 Compile main.cpp, cache.h, and cache.cpp.
 Include configuration file example.cfg, and example.trc
-Compile with g++ using c++11 with the following command: g++ -std=c++11 Cache.cpp
+Compile with g++ using c++11 with the following command:
+
+g++ -std=c++11 Cache.cpp
 main.cpp -o hw ./hw
 - - -
 Some of the sample runs :
