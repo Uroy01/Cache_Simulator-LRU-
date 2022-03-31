@@ -4,17 +4,17 @@ namespace G
 {
     typedef bitset<32> bits;
     
-    /*Constructor to initialize given values from the file*/
+   
     Cache::Cache(int& C, int&b, int&N)
     {
         capacity     = C;
-        block_size    = b;
+        block_size    = B;
         assoc        = N;
         
         createCache();
         
         cout << "Capacity: " << C << endl;
-        cout << "Block Size: " << b << endl;
+        cout << "Block Size: " << B << endl;
         cout << "Associativity: " << N << endl;
         cout << "Total blocks: " << blocks << endl;
         cout << "Total sets: " << sets << endl;
@@ -27,17 +27,13 @@ namespace G
         free(bank);    //Free memory allocated for the array of structs
     }
     
-    /*MAIN CONTROL*/
-    /*Test each individual memory address read in from the file to see if they're in the cache*/
+    
     void Cache::testMem()
     {
-        /*Allocate buckets for total memory addresses into array of structs
-            Will allocate 16 bytes per bucket, for 4 bitsets per struct
-            Total memory allocated = 695521 * 16 bytes
-        */
+       
         bank = (mem_address*)malloc(sizeof(mem_address)*memoryLength);
 
-        /*Store mem address, tag, index, offset into an array of structs*/
+        
         for(int i=0; i<memoryLength; i++)
         {
             bank[i].mem     = memory.at(i);
@@ -47,22 +43,13 @@ namespace G
 
         }
         
-        /*BEGIN CACHE OPERATION*/
+        
         int i=0;
         for(; i<memoryLength; i++)
         {
-//            cout << "__________________Checking______________" << endl;
-            
-//            printMemAdr(bank[i]);
-            
-//            insertion = make_pair(bank[i].tag, &bank[i]);
-//
-//            mapCache.insert(insertion);
-//
-//            cout << "MEM INSERTED: " <<mapCache.at(insertion.first)->mem << endl;
-//            checkEntry(bank[i].tag);
+//           
             checkEntry(bank[i]);
-//            cout << "________END CHECKING____________________" << endl;
+//            
         }
         
         cout << "NUM ACCESSES " << i << endl;
@@ -72,7 +59,7 @@ namespace G
         
         
     }
-    /*Print out the given mem address structure*/
+   
     void Cache::printMemAdr(mem_address& adr)
     {
         cout << "MEM:\t" << adr.mem <<
@@ -81,36 +68,36 @@ namespace G
                 "\nOFFSET:\t" << adr.offset << endl;
     }
     
-    /*Check a specific memory address to see if it's in the cache*/
+    
     void Cache::checkEntry(mem_address& adr)
     {
-        int currentIndex                     = bitsToInt(adr.index);            //grab our current set index from the cache
+        int currentIndex                     = bitsToInt(adr.index);            
 
-        list<tagentry>* currentSet             = &tagCache.at(currentIndex);     //make a pointer for the set an n index
+        list<tagentry>* currentSet             = &tagCache.at(currentIndex);     
         
-        list<tagentry>::iterator* currentIt = &tagIt.at(currentIndex);        //iterator for the nth set
+        list<tagentry>::iterator* currentIt = &tagIt.at(currentIndex);        
             
-        *currentIt = find(currentSet->begin(), currentSet->end(), adr.tag);    //search for the tag in the set at n index
+        *currentIt = find(currentSet->begin(), currentSet->end(), adr.tag);   
         
-        /*Cache FULL*/
+      
         if(currentSet->size() == assoc)
         {
-            /*Cache MISS*/
+           
             if( (*currentIt == currentSet->end()) )
             {
                 misses++;
                 
-                *currentIt = currentSet->begin();    //set iterator pointer to LRU
-                currentSet->erase(*currentIt);        //erase LRU
-                currentSet->push_back(adr.tag);        //push back the tag as the new MRU
+                *currentIt = currentSet->begin();    
+                currentSet->erase(*currentIt);        
+                currentSet->push_back(adr.tag);        
                 
-                /*Calculate position for iterator*/
+               
                 *currentIt = currentSet->begin();
-                advance(*currentIt, distance(*currentIt, currentSet->end())-1); //advance to the last placement
+                advance(*currentIt, distance(*currentIt, currentSet->end())-1); 
 
             }
             
-            /*Cache HIT*/
+            
             else
             {
                 hits++;
@@ -119,13 +106,13 @@ namespace G
                 
                 currentSet->push_back(adr.tag);
                 
-                /*Calculate position for iterator*/
+              
                 *currentIt = currentSet->begin();
-                advance(*currentIt, distance(*currentIt, currentSet->end())-1); //advance to the last placement
+                advance(*currentIt, distance(*currentIt, currentSet->end())-1); 
                 
             }
         }
-        /*Cache NOT FULL*/
+        
         else if ( (currentSet->size() != 0) && (currentSet->size() < assoc))
         {
             /*Cache MISS, Compulsory Miss*/
@@ -135,32 +122,32 @@ namespace G
                 
                 currentSet->push_back(adr.tag);
                 
-                /*Calculate position for iterator*/
+                
                 *currentIt = currentSet->begin();
                 advance(*currentIt, distance(*currentIt, currentSet->end())-1); //advance to the last placement
                 
             }
-            /*Cache HIT*/
+           
             else
             {
                 hits++;
                 
-                currentSet->erase(*currentIt);    //erase spot to move to MRU now
+                currentSet->erase(*currentIt);    
 
                 currentSet->push_back(adr.tag);
                 
             }
         }
-        /*Cache NEW, Compulsory Miss*/
+       
         else if( (currentSet->size() == 0) && (*currentIt == currentSet->end()) )
         {
             misses++;
             
-            currentSet->push_back(adr.tag);        //append to the back (MRU)
-            *currentIt = currentSet->begin();    //set iterator to this position since set is NEW
+            currentSet->push_back(adr.tag);       
+            *currentIt = currentSet->begin();   
         }
         
-        /*Check if iterator does not point to the same tag*/
+       
         if( (**currentIt) != adr.tag)
         {
             cout << "ERROR @ " << currentIndex << " mem:" << endl;
@@ -169,14 +156,14 @@ namespace G
             exit(0);
         }
         
-        /*Pointer cleanup*/
+       
         currentSet = nullptr;
         currentIt = nullptr;
         delete currentSet;
         delete currentIt;
     }
     
-    /*Print the given list set of blocks in the cache*/
+    
     void Cache::printSet(list<tagentry>& l)
     {
         int i=0;
@@ -187,7 +174,7 @@ namespace G
         }
     }
     
-    /*Must delete the memory allocated for the mem_address pointer before deleting the entry from the list*/
+    
     void Cache::deleteMemEntry(mem_address*& adr)
     {
         cout << "Deleting ptr: " << adr << endl;
@@ -207,18 +194,18 @@ namespace G
         hits    = 0;
         misses    = 0;
         
-        /*Allocate space for the vectors*/
+        
         tagCache.resize(sets);
         tagIt.resize(sets);
         
-        /*Initialize all iterators to their respective set's begin*/
+       
         for(int i=0; i<sets; i++)
         {
             tagIt.at(i) = tagCache.at(i).begin();
         }
     }
     
-    /*Read in the memory trace and store in a vector*/
+  
     void Cache::readMemory() {
         ifstream file;
         string line;
@@ -232,18 +219,18 @@ namespace G
         
         int j=0;
         
-        /*Read lines until end of file*/
+       
         while(!file.eof())
         {
             getline(file,line);
 
-            /*Break file read if there is only an \n character left in the file!*/
+           
             if(line.length()<2)
             {
                 break;
             }
             
-            /*Store hex address as a bitset in the storage vector*/
+          
             memory.push_back(hexToBin(line));
             
             j++;
@@ -251,28 +238,27 @@ namespace G
 
         cout << "Read in " << j << " memory addresses from the file" << endl;
         
-        memoryLength = j;    //keep track of total memory addresses on file
-
+        memoryLength = j; 
         file.close();
     }
     
-    /*Returns a bitset<32> for analyzing the memory address*/
+    
     bits Cache::hexToBin(string& s)
     {
         stringstream ss;
         unsigned int n;
         
-        /*Send the string as hex to the stream*/
+       
         ss << hex << s;
         ss >> n;
         
-        /*Construct bitset out of parsed int*/
+       
         bitset<32> b(n);
 
         return b;
     }
     
-    /*Returns the tag of the mema address as a bitset*/
+    
     bits Cache::getTag(bits& h)
     {
         bitset<32> b(h.to_string(), 0, tag);
@@ -280,7 +266,7 @@ namespace G
         return b;
     }
     
-    /*Returns index bits of the mem address given*/
+    
     bits Cache::getIndex(bits& h)
     {
         bitset<32> b(h.to_string(), tag, index);
@@ -288,7 +274,7 @@ namespace G
         return b;
     }
     
-    /*Returns offset bits of the mem address given*/
+   
     bits Cache::getOffset(bits& h)
     {
         bitset<32> b(h.to_string(), index+tag, 31);
@@ -296,11 +282,11 @@ namespace G
         return b;
     }
     
-    /*Returns int from a bitset*/
+    
     int Cache::bitsToInt(bits& h)
     {
         int b = stoi(h.to_string(), nullptr, 2);
-        //can also use b.to_ulong();
+      
         
         return b;
     }
